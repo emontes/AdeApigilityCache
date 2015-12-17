@@ -16,23 +16,22 @@ class Module implements ApigilityProviderInterface
         $cacheKey = str_replace('.','+', $route);
         unset($params['controller']);
         unset($params['action']);
-        
-        foreach ($params as $key=>$value) {
-            $strKey = $key . '-' . str_replace('.', 'p', $value);
-            $cacheKey .= '+' .$strKey;
-        }
-        
-        foreach ($query as $key=>$value) {
-            $strKey = $key . '-' . str_replace('.', 'p', $value);
-            $cacheKey .= '+' .$strKey;
-        }
+        $cacheKey .= md5(json_encode($params));
+        $cacheKey .= md5(json_encode($query));
         return $cacheKey;
     }
     
     public function onBootStrap(MvcEvent $e)
     {
         $routes = array(
-            'hoteles.rest.hotels-nearby'
+            'hoteles.rest.estado',
+            'hoteles.rest.hotel',
+            'hoteles.rest.vista',
+            'hoteles.rest.hotel-rooms',
+            'hoteles.rest.hotel-facilities',
+            'hoteles.rest.hotel-services',
+            'hoteles.rest.hotel-activities',
+            'hoteles.rest.hotel-fotos',
         );
         
         $em = $e->getApplication()->getEventManager();
@@ -81,7 +80,7 @@ class Module implements ApigilityProviderInterface
                 $params = $e->getRouteMatch()->getParams();
                 $query  = $request->getQuery();
                 $key = $this->getCacheKey($route, $params, $query);
-                $cache->setItem($key, $response->getContent());
+                $cache->setItem($key, $response->getBody());
             },
             -10000);
     }
